@@ -10,9 +10,9 @@ function App() {
   const [count, setCount] = useState(0)
   const {user,isLoaded,isSignedIn} = useUser();
 
-  if (isLoaded && !isSignedIn) {
-    return <Navigate to={"/auth/sign-in"} />;
-  }
+  //if (isLoaded && !isSignedIn) {
+  //  return <Navigate to={"/auth/sign-in"} />;
+  //}
 
   return (
     <>

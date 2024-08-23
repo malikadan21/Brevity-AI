@@ -7,6 +7,7 @@ import SignInPage from './auth/sign-in/index.jsx';
 import Home  from './LandingPage/index.jsx';
 import DashBoard from './DashBoard/index.jsx';
 import { ClerkProvider } from '@clerk/clerk-react';
+import EditResume from './DashBoard/resume/[resumeId]/edit/index.jsx';
 
 const PUBLISHABLE_KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY
 
@@ -22,6 +23,10 @@ const router = createBrowserRouter([
       {
         path:'/dashboard',
         element:<DashBoard/>
+      },
+      {
+        path:'/dashboard/resume/:resumeId/edit',
+        element:<EditResume/>
       }
     ]
   },
