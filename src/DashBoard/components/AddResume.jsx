@@ -35,6 +35,9 @@ function AddResume() {
                 userName:user?.fullName
             }
         }
+        console.log(data);
+        navigation('/dashboard/resume/'+uuid+"/edit");
+        setLoading(false);
 
         //Setup the backend API here with data
         //Api.CreateNewResume(data).then(resp=>{

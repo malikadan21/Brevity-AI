@@ -8,9 +8,9 @@ function DashBoard() {
   const {user}= useUser();
   const [resumeList,setResumeList] = useState([]);
   
-  useEffect(()=>{
+  /*useEffect(()=>{
     user&&GetResumeList()
-  },[user])
+  },[user])*/
 
   /**
    * Used to get Users Resume List
