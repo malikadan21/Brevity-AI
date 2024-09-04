@@ -1,13 +1,12 @@
-import { Input } from '@/components/ui/input'
-import React, { useContext, useEffect, useState } from 'react'
-import { Rating } from '@smastrom/react-rating'
-import '@smastrom/react-rating/style.css'
-import { Button } from '@/components/ui/button'
-import { LoaderCircle } from 'lucide-react'
-import { ResumeInfoContext } from '@/context/ResumeInfoContext'
-import { useParams } from 'react-router-dom'
-import { toast } from 'sonner'
-// import GlobalApi from './../../../../../service/GlobalApi'
+import { Input } from '@/components/ui/input';
+import React, { useContext, useEffect, useState } from 'react';
+import { Rating } from '@smastrom/react-rating';
+import '@smastrom/react-rating/style.css';
+import { Button } from '@/components/ui/button';
+import { LoaderCircle } from 'lucide-react';
+import { ResumeInfoContext } from '@/context/ResumeInfoContext';
+import { useParams } from 'react-router-dom';
+import { toast } from 'sonner';
 
 function Skills() {
   const [skillsList, setSkillsList] = useState([{
@@ -18,7 +17,6 @@ function Skills() {
   const [loading, setLoading] = useState(false);
   const { resumeInfo, setResumeInfo } = useContext(ResumeInfoContext);
 
-  // useEffect to initialize skillsList from resumeInfo if available
   useEffect(() => {
     if (resumeInfo?.skills) {
       setSkillsList(resumeInfo.skills);
@@ -42,27 +40,27 @@ function Skills() {
     setSkillsList(skillsList.slice(0, -1));
   }
 
-  const onSave = () => {
+  const onSave = (e) => {
+    e.preventDefault();
     setLoading(true);
 
-    // Combine skills list with existing resume info
-    const updatedData = {
-      ...resumeInfo,
-      skills: skillsList
-    };
+    const updatedData = { ...resumeInfo, skills: skillsList };
 
-    // Save the combined data to localStorage
-    localStorage.setItem('resumeData', JSON.stringify(updatedData));
+    setTimeout(() => {
+      const storedResumes = JSON.parse(localStorage.getItem('resumes')) || [];
+      const updatedResumes = storedResumes.map(resume =>
+        resume.resumeId === resumeId ? updatedData : resume
+      );
 
-    // Print the saved data to the console
-    console.log('Saved Data:', updatedData);
+      if (!storedResumes.some(resume => resume.resumeId === resumeId)) {
+        updatedResumes.push(updatedData);
+      }
 
-    // Update resume info context
-    setResumeInfo(updatedData);
-
-    // Notify user
-    toast('Details saved successfully!');
-    setLoading(false);
+      localStorage.setItem('resumes', JSON.stringify(updatedResumes));
+      setResumeInfo(updatedData);
+      toast('Details saved successfully!');
+      setLoading(false);
+    }, 1500); // Simulate a delay for the loading animation
   }
 
   return (
@@ -103,7 +101,7 @@ function Skills() {
         </Button>
       </div>
     </div>
-  )
+  );
 }
 
 export default Skills;

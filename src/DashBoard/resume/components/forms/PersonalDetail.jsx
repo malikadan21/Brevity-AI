@@ -7,40 +7,58 @@ import { useParams } from 'react-router-dom';
 import { toast } from 'sonner';
 
 function PersonalDetail({ enabledNext }) {
-    const params = useParams();
+    const { resumeId } = useParams();
     const { resumeInfo, setResumeInfo } = useContext(ResumeInfoContext);
-
-    const [formData, setFormData] = useState({});
+    const [formData, setFormData] = useState(resumeInfo || {});
     const [loading, setLoading] = useState(false);
 
     useEffect(() => {
-        console.log("---", resumeInfo);
-    }, []);
+        // Load existing data from localStorage if it exists
+        const storedResumes = JSON.parse(localStorage.getItem('resumes')) || [];
+        const existingResume = storedResumes.find(resume => resume.resumeId === resumeId);
+
+        if (existingResume) {
+            setFormData(existingResume);
+            setResumeInfo(existingResume);
+        }
+    }, [resumeId, setResumeInfo]);
 
     const handleInputChange = (e) => {
         enabledNext(false);
         const { name, value } = e.target;
 
-        setFormData({
+        const updatedFormData = {
             ...formData,
             [name]: value
-        });
-        setResumeInfo({
-            ...resumeInfo,
-            [name]: value
-        });
-    }
+        };
+
+        setFormData(updatedFormData);
+        setResumeInfo(updatedFormData);
+    };
 
     const onSave = (e) => {
         e.preventDefault();
         setLoading(true);
 
         // Combine form data with existing resume info
-        const updatedData = { ...resumeInfo, ...formData };
+        const updatedData = { ...resumeInfo, ...formData, resumeId };
 
-        // Save the combined data to localStorage
-        setTimeout(() => {  // Simulating a delay for the loading animation
-            localStorage.setItem('resumeData', JSON.stringify(updatedData));
+        setTimeout(() => {  // Simulate a delay for the loading animation
+            // Get all resumes from localStorage
+            const storedResumes = JSON.parse(localStorage.getItem('resumes')) || [];
+            
+            // Check if the resume already exists and update it
+            const updatedResumes = storedResumes.map(resume =>
+                resume.resumeId === resumeId ? updatedData : resume
+            );
+
+            // If it's a new resume, add it to the array
+            if (!storedResumes.some(resume => resume.resumeId === resumeId)) {
+                updatedResumes.push(updatedData);
+            }
+
+            // Save the updated resumes array back to localStorage
+            localStorage.setItem('resumes', JSON.stringify(updatedResumes));
 
             // Print the saved data to the console
             console.log('Saved Data:', updatedData);
@@ -49,7 +67,7 @@ function PersonalDetail({ enabledNext }) {
             setLoading(false);
             toast.success("Details saved successfully!");  // Display success pop-up
         }, 1500);  // Simulate a 1.5 seconds delay for the saving process
-    }
+    };
 
     return (
         <div className='p-5 shadow-lg rounded-lg border-t-primary border-t-4 mt-10'>
@@ -60,35 +78,35 @@ function PersonalDetail({ enabledNext }) {
                 <div className='grid grid-cols-2 mt-5 gap-3'>
                     <div>
                         <label className='text-sm'>First Name</label>
-                        <Input name="firstName" defaultValue={resumeInfo?.firstName} required onChange={handleInputChange} />
+                        <Input name="firstName" defaultValue={formData?.firstName} required onChange={handleInputChange} />
                     </div>
                     <div>
                         <label className='text-sm'>Last Name</label>
                         <Input name="lastName" required onChange={handleInputChange}
-                            defaultValue={resumeInfo?.lastName} />
+                            defaultValue={formData?.lastName} />
                     </div>
                     <div className='col-span-2'>
                         <label className='text-sm'>Job Title</label>
                         <Input name="jobTitle" required
-                            defaultValue={resumeInfo?.jobTitle}
+                            defaultValue={formData?.jobTitle}
                             onChange={handleInputChange} />
                     </div>
                     <div className='col-span-2'>
                         <label className='text-sm'>Address</label>
                         <Input name="address" required
-                            defaultValue={resumeInfo?.address}
+                            defaultValue={formData?.address}
                             onChange={handleInputChange} />
                     </div>
                     <div>
                         <label className='text-sm'>Phone</label>
                         <Input name="phone" required
-                            defaultValue={resumeInfo?.phone}
+                            defaultValue={formData?.phone}
                             onChange={handleInputChange} />
                     </div>
                     <div>
                         <label className='text-sm'>Email</label>
                         <Input name="email" required
-                            defaultValue={resumeInfo?.email}
+                            defaultValue={formData?.email}
                             onChange={handleInputChange} />
                     </div>
                 </div>
@@ -99,7 +117,7 @@ function PersonalDetail({ enabledNext }) {
                 </div>
             </form>
         </div>
-    )
+    );
 }
 
 export default PersonalDetail;
